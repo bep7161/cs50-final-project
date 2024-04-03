@@ -32,7 +32,7 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    return apology("Not ready yet", 400)
+    return apology("Under Construction!", 400)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -80,3 +80,8 @@ def logout():
 
     # Redirect user to login
     return redirect("/")
+
+
+@app.route("/register")
+def register():
+    return apology("Under Construction!", 400)
