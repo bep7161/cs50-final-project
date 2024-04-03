@@ -24,7 +24,7 @@
 
         <!-- Bootstrap navbar combined with C$50 Finance-->
         <nav class="bg-light border navbar navbar-expand-md navbar-light">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 {% if session["user_id"] %}
                     Hello, {{ user_id }}
                 {% else %}
@@ -39,21 +39,19 @@
                 {% if session["user_id"] %}
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">My Projects<span class="sr-only">(current)</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Gemma AI</a>
+                            <a class="nav-link" href="/projects">My Projects<span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="/" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Projects
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#">Create New Project</a>
-                                <a class="dropdown-item" href="#">Remove Projects</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">Something else here</a>
+                                <a class="dropdown-item" href="/new_project">Create New Project</a>
+                                <a class="dropdown-item" href="/remove_project">Remove Projects</a>
                             </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/openai">OpenAI</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto mt-2">

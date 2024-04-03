@@ -4,7 +4,7 @@ from functools import wraps
 def apology(message, code=400):
     # Render message as an apology to the user
 
-    def escape():
+    def escape(s):
         """
         Escape special characters.
 
