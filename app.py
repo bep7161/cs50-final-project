@@ -32,7 +32,15 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    return apology("Under Construction!", 400)
+    """ Show the portfolio of projects """
+    # Get the users projects 
+    projects = db.execute("SELECT * FROM projects WHERE user_id = ?", session["user_id"])
+
+    # Get username of current logged in user
+    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
+
+    # Return the index template with the projects variable
+    return render_template("index.html", user=user, projects=projects)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -82,12 +90,62 @@ def logout():
     return redirect("/")
 
 
-@app.route("/register", method=["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return apology("Under Construction!", 400)
+    """ Allow the user to register a new account """
+
+    # Clear any possible session
+    session.clear()
+
+    # User reaches route via POST (i.e. they submitted the form)
+    if request.method == "POST":
+        # Check username is filled in
+        if not request.form.get("username"):
+            return apology("Must provide username", 403)
+        
+        # Check password was filled in
+        elif not request.form.get("password"):
+            return apology("Must provide password", 403)
+        
+        #Check confirmation was filled in
+        elif not request.form.get("confirmation"):
+            return apology("Must confirm password", 403)
+        
+        #Check password and confirmation match
+        elif request.form.get("password") != request.form.get("confirmation"):
+            return apology("Password and confirmation did not match")
+        
+        # Query the database to see if the username already exists
+        rows = db.execute(
+            "SELECT * FROM users WHERE username = ?", request.form.get("username"))
+        
+        # If the username exists tell the user
+        if len(rows) == 1:
+            return apology("Username already exists", 403)
+        
+        # All checks are complete add new user to the db
+        db.execute("INSERT INTO users (username, hash) VALUES(?, ?)", request.form.get("username"),
+                   generate_password_hash(request.form.get("password"), method="scrypt", salt_length=16))
+        
+        # Redirect user to login page to use new credentials to login
+        return redirect("/login")
+    
+    # User reached route via GET (i.e. clicked the button or entered the link)
+    else:
+        return render_template("register.html")
 
 
-@app.route("/projects")
+@app.route("/new_project", methods=["GET", "POST"])
 @login_required
-def projects():
-    return apology("Under Construction!", 400)
+def new_project():
+    """ Allow user to create a new project """
+    # Get username of current logged in user
+    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
+
+    # User reached route via POST (i.e. clicked the submit button)
+    if request.method == "POST":
+        return apology("Under Construction!", 400)
+    
+    # User reached route via GET (i.e. clicked the link)
+    else:
+        return render_template("new_project.html", user=user)

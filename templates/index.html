@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Projects
+{% endblock %}
+
+{% block main %}
+    <table class="table table-all">
+        <thead>
+            <tr>
+                <th class="text-start">Name</th>
+                <th class="text-start">Description</th>
+                <th class="text-end">Phase</th>
+                <th class="text-end">Start Date</th>
+                <th class="text-end">End Date</th>
+                <th class="text-end">% Complete</th>
+                <th class="text-end">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+                <tr>
+                    <td class="text-start">{{ projects.name }}</td>
+                    <td class="text-start">{{ projects.description }}</td>
+                    <td class="text-end">{{ projects.phase }}</td>
+                    <td class="text-end">{{ projects.start_date }}</td>
+                    <td class="text-end">{{ projects.end_date }}</td>
+                    <td class="text-end">{{ projects.percent_complete }}%</td>
+                    <td class="text-end">{{ projects.status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

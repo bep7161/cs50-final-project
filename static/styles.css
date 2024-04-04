@@ -1,0 +1,8 @@
+/* Size for greeting */
+nav .navbar-brand
+{
+    font-family: 'Courier New', monospace;
+    font-size: xx-large;
+    color: #FFBF00;
+    font-weight: bold;
+}
