@@ -33,11 +33,12 @@ def after_request(response):
 @login_required
 def index():
     """ Show the portfolio of projects """
-    # Get the users projects 
-    projects = db.execute("SELECT * FROM projects WHERE user_id = ?", session["user_id"])
 
     # Get username of current logged in user
     user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
+
+    # Get the users projects 
+    projects = db.execute("SELECT * FROM projects WHERE user_id = ?", session["user_id"])
 
     # Return the index template with the projects variable
     return render_template("index.html", user=user, projects=projects)
@@ -113,7 +114,7 @@ def register():
         
         #Check password and confirmation match
         elif request.form.get("password") != request.form.get("confirmation"):
-            return apology("Password and confirmation did not match")
+            return apology("Password and confirmation did not match", 403)
         
         # Query the database to see if the username already exists
         rows = db.execute(
@@ -144,8 +145,95 @@ def new_project():
 
     # User reached route via POST (i.e. clicked the submit button)
     if request.method == "POST":
-        return apology("Under Construction!", 400)
+        # Check name field is populated
+        if not request.form.get("name"):
+            return apology("Must provide project name", 403, user)
+        
+        # Check descrisption is populated
+        elif not request.form.get("description"):
+            return apology("Must provide a project description", 403, user)
+        
+        # Check start date is populated
+        elif not request.form.get("start_date"):
+            return apology("Must provide the start date", 403, user)
+        
+        #Check end date is populated
+        elif not request.form.get("end_date"):
+            return apology("Must provide the end date", 403, user)
+
+        # All checks compelte, update projects table with new project
+        db.execute("INSERT INTO projects (user_id, name, description, start_date, end_date) VALUES(?, ?, ?, ?, ?)",
+                   session["user_id"], request.form.get("name"), request.form.get("description"), 
+                   request.form.get("start_date"), request.form.get("end_date"))
+        
+        # Redirect user to the project page and allow them to add tasks
+        return redirect("/")
     
     # User reached route via GET (i.e. clicked the link)
     else:
         return render_template("new_project.html", user=user)
+    
+
+@app.route("/delete_project", methods=["GET"])
+@login_required
+def delete_project():
+    """ Allow user to delete any of their projects """
+    # Get username of current logged in user
+    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
+
+    # Get the users projects 
+    projects = db.execute("SELECT * FROM projects WHERE user_id = ?", session["user_id"])
+
+    return render_template("delete_project.html", user=user, projects=projects)
+
+
+@app.route("/edit_project", methods=["GET", "POST"])
+@login_required
+def edit_project():
+    """ Allow users to edit their project and tasks """
+    # Get username of current logged in user
+    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
+
+    # Store project id from the button clicked
+    project_id = request.form.get("project_id")
+
+    # Get the users project
+    projects = db.execute("SELECT * FROM projects WHERE id = ?", project_id)
+
+    # Get the tasks for that user's project
+    tasks = db.execute("SELECT * FROM tasks WHERE project_id = ? ORDER BY end_date", project_id)
+
+    # User reached route via POST (i.e. clicked the submit button)
+    if request.method == "POST":
+        return apology("Under Construction!", 400, user)
+    
+    # User reached route via GET (i.e. clicked the link)
+    else:
+        return render_template("edit_project.html", user=user, projects=projects, tasks=tasks, project_id=project_id)
+    
+
+@app.route("/add_task", methods=["POST"])
+@login_required
+def add_task():
+    """ Allow user to add task to the project """
+    # Get the project id from the button
+    project_id = request.form.get("project_id")
+
+    #Check for no nulls!!
+
+    # Insert new task into database
+    db.execute("INSERT INTO tasks (user_id, project_id, name, description, assigned_to, state, start_date, end_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+               session["user_id"], project_id, request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"),
+               request.form.get("state"), request.form.get("start_date"), request.form.get("end_date"))
+    
+    # Redirect back to edit project page
+    return redirect("/edit_project")
+
+
+@app.route("/openai")
+@login_required
+def openai():
+    # Get username of current logged in user
+    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
+
+    return apology("Under Construction!", 400, user)

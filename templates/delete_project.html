@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Projects
+    Delete Projects
 {% endblock %}
 
 {% block main %}
@@ -20,18 +20,19 @@
         <tbody>
             {% for project in projects %}
                 <tr>
-                    <td class="text-start">
-                        <form action="/edit_project" method="get">
-                            <input name="project_id" type="hidden" value="{{ project.id }}">
-                            <button type="submit" class="btn btn-light">{{ project.name }}</button>
-                        </form>
-                    </td>
+                    <td class="text-start">{{ project.name }}</td>
                     <td class="text-start">{{ project.description }}</td>
                     <td class="text-end">{{ project.phase }}</td>
                     <td class="text-end">{{ project.start_date }}</td>
                     <td class="text-end">{{ project.end_date }}</td>
                     <td class="text-end">{{ project.percent_complete }}%</td>
                     <td class="text-end">{{ project.status }}</td>
+                    <td>
+                        <form action="/delete" method="post">
+                            <input name="project_id" type="hidden" value="{{ project.id }}">
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

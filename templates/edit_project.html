@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Project
+{% endblock %}
+
+{% block main %}
+    <h1>Project</h1>
+    <form action="/edit_project" method="post">
+        {% for project in projects %}
+            <div class="form-row" style="text-align:left">
+                <div class="form-group col-md-6">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ project.name if project.name else '' }}">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="status">Status</label>
+                    <input type="text" class="form-control" id="status" name="status" value="{{ project.status if project.status else '' }}">
+                </div>
+            </div>
+            <div class="form-group" style="text-align:left">
+                    <label for="description">Description</label>
+                    <input type="text" class="form-control" id="description" name="description" value="{{ project.description if project.descriiption else '' }}">
+            </div>
+        {% endfor %}
+    </form>
+    <h1>Tasks</h1>
+    <table class="table table-all">
+        <thead>
+            <tr>
+                <th class="text-start">Name</th>
+                <th class="text-start">Description</th>
+                <th class="text-start">Assigned To</th>
+                <th class="text-start">State</th>
+                <th class="text-start">Start Date</th>
+                <th class="text-start">End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td class="text-start">{{ task.name }}</td>
+                    <td class="text-start">{{ task.description }}</td>
+                    <td class="text-start">{{ task.assigned_to }}</td>
+                    <td class="text-start">{{ task.start_date }}</td>
+                    <td class="text-start">{{ task.end_date }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <form action="/add_task" method="post">
+                    <td>
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="name" placeholder="Name" type="text">
+                    </td>
+                    <td>
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="description" placeholder="Description" type="text">
+                    </td>
+                    <td>
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="assigned_to" placeholder="Assigned To" type="text">
+                    </td>
+                    <td>
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="state" placeholder="State" type="text">
+                    </td>
+                    <td>
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="start_date" placeholder="Start Date" type="date">
+                    </td>
+                    <td>
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="end_date" placeholder="End Date" type="date">
+                    </td>
+                    <td>
+                        <button class="btn btn-primary" name="project_id" type="submit" value="{{ project_id }}">Add Task</button>
+                    </td>
+                </form>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

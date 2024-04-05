@@ -6,3 +6,8 @@ nav .navbar-brand
     color: #FFBF00;
     font-weight: bold;
 }
+
+a .project-link
+{
+    color: #FFBF00
+}
