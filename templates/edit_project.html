@@ -6,21 +6,44 @@
 
 {% block main %}
     <h1>Project</h1>
-    <form action="/edit_project" method="post">
+    <form class="form-inline" action="/edit_project" method="post">
         {% for project in projects %}
             <div class="form-row" style="text-align:left">
-                <div class="form-group col-md-6">
-                    <label for="name">Name</label>
+                <div class="col-md-5">
+                    <label for="name"><b>Name</b></label>
                     <input type="text" class="form-control" id="name" name="name" value="{{ project.name if project.name else '' }}">
                 </div>
-                <div class="form-group col-md-6">
-                    <label for="status">Status</label>
+                <div class="col-md-5">
+                    <label for="status"><b>Status</b></label>
                     <input type="text" class="form-control" id="status" name="status" value="{{ project.status if project.status else '' }}">
                 </div>
             </div>
             <div class="form-group" style="text-align:left">
-                    <label for="description">Description</label>
-                    <input type="text" class="form-control" id="description" name="description" value="{{ project.description if project.descriiption else '' }}">
+                    <label for="description"><b>Description</b></label>
+                    <input type="text" class="form-control" id="description" name="description" value="{{ project.description if project.description else '' }}">
+            </div>
+            <div class="form-row" style="text-align:left">
+                <div class="col-md-5">
+                    <label for="start_date"><b>Start Date</b></label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ project.start_date if project.start_date else '' }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="end_date"><b>End Date</b></label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ project.end_date if project.end_date else '' }}">
+                </div>
+            </div>
+            <div class="form-row" style="text-align:left">
+                <div class="col-md-5">
+                    <label for="percent_complete"><b>Percent Complete</b></label>
+                    <input type="number" class="form-control" id="percent_complete" name="percent_complete" value="{{ project.percent_complete if project.percent_complete else '' }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="phase"><b>Phase</b></label>
+                    <input type="text" class="form-control" id="phase" name="phase" value="{{ project.phase if project.phase else '' }}">
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-primary" name="project_update" type="submit" value="{{ project_id }}">Update Project</button>
             </div>
         {% endfor %}
     </form>
@@ -47,7 +70,7 @@
                 </tr>
             {% endfor %}
             <tr>
-                <form action="/add_task" method="post">
+                <form action="/edit_project" method="post">
                     <td>
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="name" placeholder="Name" type="text">
                     </td>
@@ -67,7 +90,7 @@
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="end_date" placeholder="End Date" type="date">
                     </td>
                     <td>
-                        <button class="btn btn-primary" name="project_id" type="submit" value="{{ project_id }}">Add Task</button>
+                        <button class="btn btn-primary" name="add_task" type="submit" value="{{ project_id }}">Add Task</button>
                     </td>
                 </form>
             </tr>

@@ -1,7 +1,7 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -29,7 +29,7 @@ def after_request(response):
     return response
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
     """ Show the portfolio of projects """
@@ -40,8 +40,14 @@ def index():
     # Get the users projects 
     projects = db.execute("SELECT * FROM projects WHERE user_id = ?", session["user_id"])
 
+    # When the user clicks the button for one of their projects
+    if request.method == "POST":
+        project_id = request.form["project_id"]
+        return redirect("/edit_project/" + project_id)
+
     # Return the index template with the projects variable
-    return render_template("index.html", user=user, projects=projects)
+    else:
+        return render_template("index.html", user=user, projects=projects)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -187,15 +193,12 @@ def delete_project():
     return render_template("delete_project.html", user=user, projects=projects)
 
 
-@app.route("/edit_project", methods=["GET", "POST"])
+@app.route("/edit_project/<project_id>", methods=["GET", "POST"])
 @login_required
-def edit_project():
+def edit_project(project_id):
     """ Allow users to edit their project and tasks """
     # Get username of current logged in user
     user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
-
-    # Store project id from the button clicked
-    project_id = request.form.get("project_id")
 
     # Get the users project
     projects = db.execute("SELECT * FROM projects WHERE id = ?", project_id)
@@ -203,21 +206,39 @@ def edit_project():
     # Get the tasks for that user's project
     tasks = db.execute("SELECT * FROM tasks WHERE project_id = ? ORDER BY end_date", project_id)
 
-    # User reached route via POST (i.e. clicked the submit button)
+    # User clicks one of the two buttons on the page
     if request.method == "POST":
-        return apology("Under Construction!", 400, user)
     
-    # User reached route via GET (i.e. clicked the link)
+        # If the user clicked the Update Project button
+        if "project_update" in request.form:
+            # Update projects database with fields
+            db.execute("UPDATE projects SET name = ?, description = ?, start_date = ?, end_date = ?, percent_complete = ?, status = ?, phase = ? WHERE id = ?",
+                       request.form.get("name"), request.form.get("description"), request.form.get("start_date"), request.form.get("end_date"),
+                       request.form.get("percent_complete"), request.form.get("status"), request.form.get("phase"), project_id)
+            
+            return render_template("edit_project.html", user=user, projects=projects, tasks=tasks, project_id=project_id)
+        
+        # If the user clicked the Add Task button
+        elif "add_task" in request.form:
+            # Insert new task into database
+            db.execute("INSERT INTO tasks (user_id, project_id, name, description, assigned_to, state, start_date, end_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                       session["user_id"], int(project_id), request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"),
+                       request.form.get("state"), request.form.get("start_date"), request.form.get("end_date"))
+
+            return render_template("edit_project.html", user=user, projects=projects, tasks=tasks, project_id=project_id)
+
+    # User reached route via GET (i.e. clicked the link)       
     else:
-        return render_template("edit_project.html", user=user, projects=projects, tasks=tasks, project_id=project_id)
+        return render_template("edit_project.html", project_id=project_id, user=user, projects=projects, tasks=tasks)
     
 
 @app.route("/add_task", methods=["POST"])
 @login_required
 def add_task():
     """ Allow user to add task to the project """
+
     # Get the project id from the button
-    project_id = request.form.get("project_id")
+    project_id = request.args.get("project_id")
 
     #Check for no nulls!!
 
@@ -228,7 +249,6 @@ def add_task():
     
     # Redirect back to edit project page
     return redirect("/edit_project")
-
 
 @app.route("/openai")
 @login_required
