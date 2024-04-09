@@ -21,7 +21,7 @@
             {% for project in projects %}
                 <tr>
                     <td class="text-start">
-                        <form action="/edit_project" method="get">
+                        <form action="/" method="post">
                             <input name="project_id" type="hidden" value="{{ project.id }}">
                             <button type="submit" class="btn btn-light">{{ project.name }}</button>
                         </form>

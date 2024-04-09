@@ -43,7 +43,8 @@ def index():
     # When the user clicks the button for one of their projects
     if request.method == "POST":
         project_id = request.form["project_id"]
-        return redirect("/edit_project/" + project_id)
+        url = "/edit_project/" + str(project_id)
+        return redirect(url)
 
     # Return the index template with the projects variable
     else:
@@ -180,7 +181,7 @@ def new_project():
         return render_template("new_project.html", user=user)
     
 
-@app.route("/delete_project", methods=["GET"])
+@app.route("/delete_project", methods=["GET", "POST"])
 @login_required
 def delete_project():
     """ Allow user to delete any of their projects """
@@ -190,7 +191,21 @@ def delete_project():
     # Get the users projects 
     projects = db.execute("SELECT * FROM projects WHERE user_id = ?", session["user_id"])
 
-    return render_template("delete_project.html", user=user, projects=projects)
+    # User reached route via POST (i.e. clicked the delete button)
+    if request.method == "POST":
+        # Get project id from the button
+        id = request.form.get("project_id")
+
+        # Delete project and tasks from databases
+        db.execute("DELETE FROM tasks WHERE project_id = ?", id)
+        db.execute("DELETE FROM projects WHERE id = ?", id)        
+
+        # Redirect back to the delete proejcts page
+        return redirect("/delete_project")
+
+    # User reached route via GET (i.e. clicked the link)
+    else:
+        return render_template("delete_project.html", user=user, projects=projects)
 
 
 @app.route("/edit_project/<project_id>", methods=["GET", "POST"])
@@ -216,39 +231,54 @@ def edit_project(project_id):
                        request.form.get("name"), request.form.get("description"), request.form.get("start_date"), request.form.get("end_date"),
                        request.form.get("percent_complete"), request.form.get("status"), request.form.get("phase"), project_id)
             
-            return render_template("edit_project.html", user=user, projects=projects, tasks=tasks, project_id=project_id)
+            url = "/edit_project/" + project_id
+            return redirect(url)
         
         # If the user clicked the Add Task button
         elif "add_task" in request.form:
             # Insert new task into database
             db.execute("INSERT INTO tasks (user_id, project_id, name, description, assigned_to, state, start_date, end_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                       session["user_id"], int(project_id), request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"),
+                       session["user_id"], project_id, request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"),
                        request.form.get("state"), request.form.get("start_date"), request.form.get("end_date"))
 
-            return render_template("edit_project.html", user=user, projects=projects, tasks=tasks, project_id=project_id)
+            url = "/edit_project/" + project_id
+            return redirect(url)
 
     # User reached route via GET (i.e. clicked the link)       
     else:
         return render_template("edit_project.html", project_id=project_id, user=user, projects=projects, tasks=tasks)
-    
 
-@app.route("/add_task", methods=["POST"])
+
+@app.route("/edit_task", methods=["GET", "POST"])
 @login_required
-def add_task():
-    """ Allow user to add task to the project """
-
-    # Get the project id from the button
-    project_id = request.args.get("project_id")
-
-    #Check for no nulls!!
-
-    # Insert new task into database
-    db.execute("INSERT INTO tasks (user_id, project_id, name, description, assigned_to, state, start_date, end_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-               session["user_id"], project_id, request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"),
-               request.form.get("state"), request.form.get("start_date"), request.form.get("end_date"))
+def edit_task():
+    # Get username of current logged in user
+    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
     
-    # Redirect back to edit project page
-    return redirect("/edit_project")
+    # Get task id from button press
+    task_id = request.form.get("task_id")
+
+    # Pull the task from the database
+    tasks = db.execute("SELECT * FROM  tasks WHERE id = ?", task_id)
+
+    # Set project_id for the redirect back to edit project
+    project_id = db.execute("SELECT project_id FROM tasks WHERE id = ?", task_id)
+
+    # User reached route via POST (i.e. clicked the update button)
+    if request.method == "POST":
+        # Update the database
+        db.execute("UPDATE tasks SET name = ?, description = ?, assigned_to = ?, state = ?, start_date = ?, end_date = ? WHERE id = ?",
+                   request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"),
+                   request.form.get("state"), request.form.get("start_date"), request.form.get("end_date"), task_id)
+        
+        # Redirect to edit project
+        url = "/edit_project/" + str(project_id)
+        return redirect(url)
+    
+    # User reached route via GET (i.e. clicked the link)
+    else:
+        return render_template("/edit_task.html", user=user, tasks=tasks)
+
 
 @app.route("/openai")
 @login_required

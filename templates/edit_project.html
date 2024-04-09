@@ -6,7 +6,7 @@
 
 {% block main %}
     <h1>Project</h1>
-    <form class="form-inline" action="/edit_project" method="post">
+    <form class="form-inline" action="/edit_project/{{ project_id }}" method="post">
         {% for project in projects %}
             <div class="form-row" style="text-align:left">
                 <div class="col-md-5">
@@ -35,7 +35,7 @@
             <div class="form-row" style="text-align:left">
                 <div class="col-md-5">
                     <label for="percent_complete"><b>Percent Complete</b></label>
-                    <input type="number" class="form-control" id="percent_complete" name="percent_complete" value="{{ project.percent_complete if project.percent_complete else '' }}">
+                    <input type="number" class="form-control" id="percent_complete" name="percent_complete" value="{{ project.percent_complete if project.percent_complete else '0' }}">
                 </div>
                 <div class="col-md-5">
                     <label for="phase"><b>Phase</b></label>
@@ -65,12 +65,19 @@
                     <td class="text-start">{{ task.name }}</td>
                     <td class="text-start">{{ task.description }}</td>
                     <td class="text-start">{{ task.assigned_to }}</td>
+                    <td class="text-start">{{ task.state }}</td>
                     <td class="text-start">{{ task.start_date }}</td>
                     <td class="text-start">{{ task.end_date }}</td>
+                    <td>
+                        <form action="/edit_task" method="get">
+                            <input name="task_id" type="hidden" value="{{ task.id }}">
+                            <button type="submit" class="btn btn-primary">Edit Task</button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
             <tr>
-                <form action="/edit_project" method="post">
+                <form action="/edit_project/{{ project_id }}" method="post">
                     <td>
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="name" placeholder="Name" type="text">
                     </td>
@@ -81,7 +88,12 @@
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="assigned_to" placeholder="Assigned To" type="text">
                     </td>
                     <td>
-                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="state" placeholder="State" type="text">
+                        <select class="form-control mx-auto w-auto" name="state" id="state">
+                            <option value="Pending">Pending</option>
+                            <option value="Work In Progress">Work In Progress</option>
+                            <option value="Closed Complete">Closed Complete</option>
+                            <option value="Closed Skipped">Closed Skipped</option>
+                        </select>
                     </td>
                     <td>
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="start_date" placeholder="Start Date" type="date">
