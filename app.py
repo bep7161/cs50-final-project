@@ -257,12 +257,3 @@ def edit_project(project_id):
     # User reached route via GET (i.e. clicked the link)       
     else:
         return render_template("edit_project.html", project_id=project_id, user=user, projects=projects, tasks=tasks)
-
-
-@app.route("/openai")
-@login_required
-def openai():
-    # Get username of current logged in user
-    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
-
-    return apology("Under Construction!", 400, user)

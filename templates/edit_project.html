@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div>
-                <button class="btn btn-primary" name="project_update" type="submit" value="{{ project.id }}">Update Project</button>
+                <button class="btn btn-warning" name="project_update" type="submit" value="{{ project.id }}">Update Project</button>
             </div>
         {% endfor %}
     </form>
@@ -97,7 +97,7 @@
                                 <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="end_date" placeholder="End Date" type="date" value="{{ task.end_date if task.end_date else '' }}">
                             </td>
                             <td>
-                                <button class="btn btn-primary" name="task_update" type="submit" value="{{ task.id }}">Update</button>
+                                <button class="btn btn-outline-info" name="task_update" type="submit" value="{{ task.id }}">Update</button>
                             </td>
                     </form>
                 </tr>
@@ -129,7 +129,7 @@
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="end_date" placeholder="End Date" type="date">
                     </td>
                     <td>
-                        <button class="btn btn-primary" name="add_task" type="submit" value="{{ project_id }}">Add Task</button>
+                        <button class="btn btn-info" name="add_task" type="submit" value="{{ project_id }}">Add Task</button>
                     </td>
                 </form>
             </tr>
