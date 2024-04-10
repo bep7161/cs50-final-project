@@ -15,7 +15,11 @@
                 </div>
                 <div class="col-md-5">
                     <label for="status"><b>Status</b></label>
-                    <input type="text" class="form-control" id="status" name="status" value="{{ project.status if project.status else '' }}">
+                    <select class="form-control" name="status" id="status">
+                        <option value="Green" {% if project.status == "Green" %}selected{% endif %}>Green</option>
+                        <option value="Yellow" {% if project.status == "Yellow" %}selected{% endif %}>Yellow</option>
+                        <option value="Red" {% if project.status == "Red" %}selected{% endif %}>Red</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group" style="text-align:left">
@@ -39,11 +43,17 @@
                 </div>
                 <div class="col-md-5">
                     <label for="phase"><b>Phase</b></label>
-                    <input type="text" class="form-control" id="phase" name="phase" value="{{ project.phase if project.phase else '' }}">
+                    <select class="form-control" name="phase" id="phase">
+                        <option value="Initiating" {% if project.phase == "Iniating" %}selected{% endif %}>Initiating</option>
+                        <option value="Planning" {% if project.phase == "Planning" %}selected{% endif %}>Planning</option>
+                        <option value="Executing" {% if project.phase == "Executing" %}selected{% endif %}>Executing</option>
+                        <option value="Delivering" {% if project.phase == "Delivering" %}selected{% endif %}>Delivering</option>
+                        <option value="Closing" {% if project.phase == "Closing" %}selected{% endif %}>Closing</option>
+                    </select>
                 </div>
             </div>
             <div>
-                <button class="btn btn-primary" name="project_update" type="submit" value="{{ project_id }}">Update Project</button>
+                <button class="btn btn-primary" name="project_update" type="submit" value="{{ project.id }}">Update Project</button>
             </div>
         {% endfor %}
     </form>
@@ -62,18 +72,34 @@
         <tbody>
             {% for task in tasks %}
                 <tr>
-                    <td class="text-start">{{ task.name }}</td>
-                    <td class="text-start">{{ task.description }}</td>
-                    <td class="text-start">{{ task.assigned_to }}</td>
-                    <td class="text-start">{{ task.state }}</td>
-                    <td class="text-start">{{ task.start_date }}</td>
-                    <td class="text-start">{{ task.end_date }}</td>
-                    <td>
-                        <form action="/edit_task" method="get">
-                            <input name="task_id" type="hidden" value="{{ task.id }}">
-                            <button type="submit" class="btn btn-primary">Edit Task</button>
-                        </form>
-                    </td>
+                    <form action="/edit_project/{{ project_id }}" method="post">
+                            <td>
+                                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="name" placeholder="Name" type="text" value="{{ task.name if task.name else '' }}">
+                            </td>
+                            <td>
+                                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="description" placeholder="Description" type="text" value="{{ task.description if task.description else '' }}">
+                            </td>
+                            <td>
+                                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="assigned_to" placeholder="Assigned To" type="text" value="{{ task.assigned_to if task.assigned_to else '' }}">
+                            </td>
+                            <td>
+                                <select class="form-control mx-auto w-auto" name="state" id="state">
+                                    <option value="Pending" {% if task.state == "Pending" %}selected{% endif %}>Pending</option>
+                                    <option value="Work In Progress" {% if task.state == "Work In Progress" %}selected{% endif %}>Work In Progress</option>
+                                    <option value="Closed Complete" {% if task.state == "Closed Complete" %}selected{% endif %}>Closed Complete</option>
+                                    <option value="Closed Skipped" {% if task.state == "Closed Skipped" %}selected{% endif %}>Closed Skipped</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="start_date" placeholder="Start Date" type="date" value="{{ task.start_date if task.start_date else '' }}">
+                            </td>
+                            <td>
+                                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="end_date" placeholder="End Date" type="date" value="{{ task.end_date if task.end_date else '' }}">
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" name="task_update" type="submit" value="{{ task.id }}">Update</button>
+                            </td>
+                    </form>
                 </tr>
             {% endfor %}
             <tr>
@@ -89,6 +115,7 @@
                     </td>
                     <td>
                         <select class="form-control mx-auto w-auto" name="state" id="state">
+                            <option selected disabled>State</option>
                             <option value="Pending">Pending</option>
                             <option value="Work In Progress">Work In Progress</option>
                             <option value="Closed Complete">Closed Complete</option>

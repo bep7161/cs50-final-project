@@ -244,40 +244,19 @@ def edit_project(project_id):
             url = "/edit_project/" + project_id
             return redirect(url)
 
+        # If the user clicked the Update button
+        elif "task_update" in request.form:
+            # Update task table with information for this specific
+            db.execute("UPDATE tasks SET name = ?, description = ?, assigned_to = ?, state = ?, start_date = ?, end_date = ? WHERE id = ?",
+                       request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"), request.form.get("state"),
+                       request.form.get("start_date"), request.form.get("end_date"), request.form.get("task_update"))
+            
+            url = "/edit_project/" + project_id
+            return redirect(url)
+
     # User reached route via GET (i.e. clicked the link)       
     else:
         return render_template("edit_project.html", project_id=project_id, user=user, projects=projects, tasks=tasks)
-
-
-@app.route("/edit_task", methods=["GET", "POST"])
-@login_required
-def edit_task():
-    # Get username of current logged in user
-    user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])[0]
-    
-    # Get task id from button press
-    task_id = request.form.get("task_id")
-
-    # Pull the task from the database
-    tasks = db.execute("SELECT * FROM  tasks WHERE id = ?", task_id)
-
-    # Set project_id for the redirect back to edit project
-    project_id = db.execute("SELECT project_id FROM tasks WHERE id = ?", task_id)
-
-    # User reached route via POST (i.e. clicked the update button)
-    if request.method == "POST":
-        # Update the database
-        db.execute("UPDATE tasks SET name = ?, description = ?, assigned_to = ?, state = ?, start_date = ?, end_date = ? WHERE id = ?",
-                   request.form.get("name"), request.form.get("description"), request.form.get("assigned_to"),
-                   request.form.get("state"), request.form.get("start_date"), request.form.get("end_date"), task_id)
-        
-        # Redirect to edit project
-        url = "/edit_project/" + str(project_id)
-        return redirect(url)
-    
-    # User reached route via GET (i.e. clicked the link)
-    else:
-        return render_template("/edit_task.html", user=user, tasks=tasks)
 
 
 @app.route("/openai")
